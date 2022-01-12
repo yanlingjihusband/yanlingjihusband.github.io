@@ -148,6 +148,85 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/01/13/Antialiasing/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="艾美之灵">
+      <meta itemprop="description" content="申鹤姐姐真不错">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="junk收容所">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/01/13/Antialiasing/" class="post-title-link" itemprop="url">【计算机图形学】光栅化（深度测试与抗锯齿）</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-01-13 02:26:46 / 修改时间：02:29:36" itemprop="dateCreated datePublished" datetime="2022-01-13T02:26:46+08:00">2022-01-13</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="1-采样理论"><a href="#1-采样理论" class="headerlink" title="1.采样理论"></a>1.采样理论</h2><p><img src="https://img-blog.csdnimg.cn/1e71e5b406d44806a82297d3391dae29.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAc2luZ2xlIOWQmw==,size_20,color_FFFFFF,t_70,g_se,x_16" alt="在这里插入图片描述"></p>
+<p>经过三角形光栅化采样算法后，会出现明显的锯齿走样现象<br><img src="https://img-blog.csdnimg.cn/b47603e8abd940f29474623b2fa9970b.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAc2luZ2xlIOWQmw==,size_20,color_FFFFFF,t_70,g_se,x_16" alt="在这里插入图片描述"></p>
+<h2 id="1-1走样的类型"><a href="#1-1走样的类型" class="headerlink" title="1.1走样的类型"></a>1.1走样的类型</h2><p>1.锯齿：采样存在空隙<br>2.条纹：欠采样、采样过疏<br>3.车轮效应：时间上的采样<br>之所以会发生走样，是应为采样过慢，信号的频率太快<br><img src="https://img-blog.csdnimg.cn/d065ab1128e9491daff1ac81c4faf3c8.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAc2luZ2xlIOWQmw==,size_20,color_FFFFFF,t_70,g_se,x_16" alt="在这里插入图片描述"></p>
+<h2 id="1-2频域"><a href="#1-2频域" class="headerlink" title="1.2频域"></a>1.2频域</h2><p>傅里叶变换可以将一个信号转化到频域上。<br><img src="https://img-blog.csdnimg.cn/7f08988b08ec452388ab3d52cab376ca.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAc2luZ2xlIOWQmw==,size_20,color_FFFFFF,t_70,g_se,x_16" alt="在这里插入图片描述"><br>滤波器（Filtering） ：去掉某些频率内容<br>图片转化到频域上显示：<br><img src="https://img-blog.csdnimg.cn/ea6538fea9d543af9cf5aaa70d9ccf0d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAc2luZ2xlIOWQmw==,size_20,color_FFFFFF,t_70,g_se,x_16" alt="在这里插入图片描述"><br>频域这张图越中间代表越低频信息，越靠外代表越高频信息</p>
+<p>用高通滤波器，会发现只剩下图像轮廓，这是因为图像的边界会有明显的色彩变化，即频率很高，所以可以滤过来。<br><img src="https://img-blog.csdnimg.cn/c338291faca74bc5a109a0ac581bb9ac.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAc2luZ2xlIOWQmw==,size_20,color_FFFFFF,t_70,g_se,x_16" alt="在这里插入图片描述"><br>同理。<br>低通滤波器则是让图片模糊（没有边界了）<br><img src="https://img-blog.csdnimg.cn/64449c95f436489e8189b1642ec767d6.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAc2luZ2xlIOWQmw==,size_20,color_FFFFFF,t_70,g_se,x_16" alt="在这里插入图片描述"><br>中通则是显示一些渐变轮廓<br><img src="https://img-blog.csdnimg.cn/a0d819ef05e64ccf957ed0a14b874c55.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAc2luZ2xlIOWQmw==,size_20,color_FFFFFF,t_70,g_se,x_16" alt="在这里插入图片描述"></p>
+<h2 id="1-3卷积（Convolution）"><a href="#1-3卷积（Convolution）" class="headerlink" title="1.3卷积（Convolution）"></a>1.3卷积（Convolution）</h2><p>就是一个平均化操作（特定情境）<br><img src="https://img-blog.csdnimg.cn/04c54ecadee74f2fb5c7223e7122f858.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAc2luZ2xlIOWQmw==,size_20,color_FFFFFF,t_70,g_se,x_16" alt="在这里插入图片描述"><br><img src="https://img-blog.csdnimg.cn/e43a9ca1db334cc6bdf1d0d9927bceae.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAc2luZ2xlIOWQmw==,size_20,color_FFFFFF,t_70,g_se,x_16" alt="在这里插入图片描述"><br>一个结论：空间域的卷积等于频域的乘法，反之亦然<br>所以图片的卷积操作（模糊化）有两个选项：<br>选项1:<br>•在空间域通过卷积进行滤波<br>选项2:<br>•变换到频域(傅里叶变换)<br>•乘以卷积核的傅里叶变换<br>•变换回空间域(反傅里叶)<br><img src="https://img-blog.csdnimg.cn/00b892089db44117b82675ac8049e0e6.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAc2luZ2xlIOWQmw==,size_20,color_FFFFFF,t_70,g_se,x_16" alt="在这里插入图片描述"><br>注：选用卷积核越大，频率越低，画面越模糊</p>
+<h2 id="1-4采样-重复频率内容"><a href="#1-4采样-重复频率内容" class="headerlink" title="1.4采样=重复频率内容"></a>1.4采样=重复频率内容</h2><p><img src="https://img-blog.csdnimg.cn/ffc270c4f6db4e9b85c16a0b5c63167a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAc2luZ2xlIOWQmw==,size_20,color_FFFFFF,t_70,g_se,x_16" alt="在这里插入图片描述"><br>走样=混合频率内容<br><img src="https://img-blog.csdnimg.cn/c65a9f0dfdb049b699cf4220220356bb.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAc2luZ2xlIOWQmw==,size_20,color_FFFFFF,t_70,g_se,x_16" alt="在这里插入图片描述"></p>
+<h2 id="1-5反走样（Antialiasing）"><a href="#1-5反走样（Antialiasing）" class="headerlink" title="1.5反走样（Antialiasing）"></a>1.5反走样（Antialiasing）</h2><p>如何减少混叠误差?<br>方案1:提高采样率<br>•本质上增加复制之间的距离<br>傅里叶域中<br>•更高分辨率的显示，传感器，帧缓冲…<br>•但是:成本昂贵，可能需要非常高的分辨率<br>选项2:抗锯齿<br>•重复之前让傅里叶内容“更窄”<br>•即在采样前过滤掉高频<br><img src="https://img-blog.csdnimg.cn/3b98e123e62e4e009a21a7efcec0e62a.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAc2luZ2xlIOWQmw==,size_20,color_FFFFFF,t_70,g_se,x_16" alt="在这里插入图片描述"><br>先模糊，后采样（注意光栅化三角形中的反锯齿边缘，像素值取中间值）<br><img src="https://img-blog.csdnimg.cn/743f0cf857b440ef86c12f9bfb7e7df1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAc2luZ2xlIOWQmw==,size_20,color_FFFFFF,t_70,g_se,x_16" alt="在这里插入图片描述"></p>
+<h2 id="2-实际光栅化"><a href="#2-实际光栅化" class="headerlink" title="2.实际光栅化"></a>2.实际光栅化</h2><p>通过平均像素区域的值来抗锯齿<br>解决方案:<br>•卷积f(x,y)一个1像素的框模糊<br>—Recall: convolving = filtering = average<br>•然后在每个像素的中心取样，通过计算平均像素值来抗锯齿<br>在光栅化一个三角形时，像素内的平均值f(x,y) =内(三角形，x,y)的面积等于<br>被三角形覆盖的像素。<br><img src="https://img-blog.csdnimg.cn/3e5a13e227a74f2488da2758e742f455.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAc2luZ2xlIOWQmw==,size_20,color_FFFFFF,t_70,g_se,x_16" alt="在这里插入图片描述"></p>
+<h2 id="2-1-超采样反走样-Super-Sampling-AA"><a href="#2-1-超采样反走样-Super-Sampling-AA" class="headerlink" title="2.1 超采样反走样(Super Sampling AA)"></a>2.1 超采样反走样(Super Sampling AA)</h2><p>SSAA的想法其实是非常直观的，如果有限离散像素点逼近结果不好，那么我们用更多的采样点去逼近不就会得到更好的结果了吗？所以根据这个思想我们可以把原来的每个像素点进行细分，比如下例中，我们讲每个像素点细分成了4个采样点：</p>
+<p><img src="https://img-blog.csdnimg.cn/dcf1f934a7c348198d12b5e23df69586.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAc2luZ2xlIOWQmw==,size_20,color_FFFFFF,t_70,g_se,x_16" alt="在这里插入图片描述"></p>
+<p>我们根据每个采样点来进行shading（该概念还未提及，可以理解为计算每个像素点的颜色的过程，当然这里是一个纯红色的三角形，如果该点在三角形内，它的颜色值可以直接得到为（1，0，0）），这样得到了每个采样点的颜色之后，我们讲每个像素点内部所细分的采样点的颜色值全部加起来再求均值，作为该像素点的抗走样之后的颜色值！结果如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/7ad418e5341f4dafb5c459675989d0e1.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAc2luZ2xlIOWQmw==,size_20,color_FFFFFF,t_70,g_se,x_16" alt="在这里插入图片描述"></p>
+<p>当然读者可能还是觉得，这还不是有锯齿，咋就抗锯齿了呢？</p>
+<p>仔细观察可以发现因为将4个采样点的颜色求均值的之后，靠近三角形边缘的像素点有的变淡了，从宏观角度来看的话，这个锯齿就会变得不那么明显了。我们可以看看这样一个具体例子。</p>
+<p><img src="https://img-blog.csdnimg.cn/c0654c1749914b99a15b91df3339bf68.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAc2luZ2xlIOWQmw==,size_20,color_FFFFFF,t_70,g_se,x_16" alt="在这里插入图片描述"></p>
+<p>怎么样，效果还是相当明显吧！</p>
+<p>(tips：SSAA并不局限于分成4个，也可以分更多的，可以自己决定，如果喜欢玩游戏的读者一定知道游戏里面其实就有一个抗锯齿的选项，其中的 × 2 , × 3 , × 4 \times2,\times3,\times4×2,×3,×4,分别代表的就是4个，9个，16个采样点，显然采样点越多抗锯齿效果越好，但计算负担也会随之增加）。</p>
+<h2 id="2-2-多采样反走样-Multi-Sampling-AA"><a href="#2-2-多采样反走样-Multi-Sampling-AA" class="headerlink" title="2.2 多采样反走样(Multi-Sampling AA)"></a>2.2 多采样反走样(Multi-Sampling AA)</h2><p>MSAA其实是对SSAA的一个改进，显然SSAA的计算量是非常大的，每个像素点分成4个采样点，我们就要进行4次的shading来计算颜色，额外多了4倍的计算量，如何降低它呢？<br>就只取边缘有锯齿的地方用ssaa。。</p>
+<p>至于FXAA，那是先采样，再消除锯齿。<br>TAA是根据时序采样来抗锯齿的。。</p>
+<p>后面或许会补充，这tm都能写1个小时是我没想到的，好浪费时间，焯！</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/01/09/post/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -187,7 +266,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>常用命令组合：<br>1.连接github：ssh -T <a href="mailto:&#103;&#x69;&#x74;&#64;&#x67;&#105;&#116;&#104;&#x75;&#98;&#46;&#x63;&#x6f;&#109;">&#103;&#x69;&#x74;&#64;&#x67;&#105;&#116;&#104;&#x75;&#98;&#46;&#x63;&#x6f;&#109;</a><br>2.本地部署网站：hexo s<br>3.上传网站：hexo clean<br>            hexo g<br>            hexo d<br>4.新建一篇文章：hexo new a（名字）<br>参考链接：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/102592286">https://zhuanlan.zhihu.com/p/102592286</a><br>后续有心情了再扩充吧，反正上面那4个经常用。。</p>
+          <p>常用命令组合：<br>1.连接github：ssh -T <a href="mailto:&#x67;&#105;&#116;&#64;&#103;&#105;&#x74;&#x68;&#117;&#98;&#46;&#x63;&#x6f;&#109;">&#x67;&#105;&#116;&#64;&#103;&#105;&#x74;&#x68;&#117;&#98;&#46;&#x63;&#x6f;&#109;</a><br>2.本地部署网站：hexo s<br>3.上传网站：hexo clean<br>            hexo g<br>            hexo d<br>4.新建一篇文章：hexo new a（名字）<br>参考链接：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/102592286">https://zhuanlan.zhihu.com/p/102592286</a><br>后续有心情了再扩充吧，反正上面那4个经常用。。</p>
 
       
     </div>
@@ -491,7 +570,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">5</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
